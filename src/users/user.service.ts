@@ -9,7 +9,6 @@ import { ReadGetUserDto } from "./dto/read-get-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { ReadUpdateUserDto } from "./dto/read-update-user.dto";
 import { Order } from "../entities/order.entity";
-import { Product } from "../entities/product.entity";
 import { EntityManager } from "typeorm";
 
 export class UserService {
@@ -160,7 +159,6 @@ export class UserService {
             { userId: null }
           );
 
-          await transactionalEntityManager.delete(Product, { userId });
           await transactionalEntityManager.delete(User, { id: userId });
 
           return { message: "User deleted successfully" };

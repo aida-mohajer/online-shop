@@ -14,6 +14,7 @@ export const pagination = async (
   res: Response,
   next: NextFunction
 ) => {
+  //needs default value instead of undefined?
   const pageParam = req.query.page
     ? parseInt(req.query.page as string, 10)
     : undefined;

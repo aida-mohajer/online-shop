@@ -1,6 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Base } from "./base.entity";
-import { Product } from "./product.entity";
 import { CartItem } from "./cartItem.entity";
 import { Wishlist } from "./wishlist.entity";
 import { Order } from "./order.entity";
@@ -37,7 +36,4 @@ export class User extends Base {
 
   @OneToMany(() => Feedback, (feedback) => feedback.user)
   feedbacks!: Feedback[];
-
-  @OneToMany(() => Product, (product) => product.createdBy)
-  createdProducts!: Product[];
 }

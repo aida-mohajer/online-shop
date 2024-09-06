@@ -1,7 +1,6 @@
 import { EntityManager } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { Category } from "../entities/category.entity";
-import { Feedback } from "../entities/feedback.entity";
 import { Order } from "../entities/order.entity";
 import { Product } from "../entities/product.entity";
 import { User } from "../entities/user.entity";
@@ -17,9 +16,7 @@ export class ProductService {
   constructor(
     private productRepository = AppDataSource.getRepository(Product),
     private userRepository = AppDataSource.getRepository(User),
-    private categoryRepository = AppDataSource.getRepository(Category),
-    private feedbackRepository = AppDataSource.getRepository(Feedback),
-    private orderRepository = AppDataSource.getRepository(Order)
+    private categoryRepository = AppDataSource.getRepository(Category)
   ) {}
   async addProduct(
     data: ProductDto,
@@ -40,10 +37,10 @@ export class ProductService {
 
       const product = this.productRepository.create({
         categoryId: category.id,
-        userId: user?.id,
         productName: data.productName,
         price: data.price,
         description: data.description,
+        rating: 0,
       });
 
       await this.productRepository.save(product);
@@ -69,14 +66,13 @@ export class ProductService {
       if (!product) {
         return { error: "Product not found" };
       }
+
       const dto = new ReadGetProductDto();
       dto.productName = product.productName;
       dto.price = product.price;
       dto.description = product.description;
+      dto.rating = product.rating;
 
-      if (product.createdBy) {
-        dto.createdby = { username: product.createdBy.username };
-      }
       return dto;
     } catch (error) {
       console.error("Error during retrieve product:", error);
@@ -89,7 +85,12 @@ export class ProductService {
     try {
       const [allProducts, totalProducts] = await this.productRepository
         .createQueryBuilder("product")
-        .select(["product.productName", "product.price", "product.description"])
+        .select([
+          "product.productName",
+          "product.price",
+          "product.description",
+          "product.rating",
+        ])
         .skip(skip)
         .take(limit)
         .getManyAndCount();
@@ -98,6 +99,7 @@ export class ProductService {
         productName: product.productName,
         price: product.price,
         description: product.description,
+        rating: product.rating,
       }));
 
       const totalPages = Math.ceil(totalProducts / limit);
@@ -110,7 +112,6 @@ export class ProductService {
   }
 
   async updateProduct(
-    userId: string,
     productId: string,
     data: UpdateProductDto
   ): Promise<ReadUpdateProductDto> {
@@ -122,10 +123,6 @@ export class ProductService {
       if (!product) {
         return { error: "Product not found" };
       }
-
-      // if (product.userId !== userId) {
-      //   return { error: "You are not authorized to update this product" };
-      // }
 
       Object.assign(product, data);
 

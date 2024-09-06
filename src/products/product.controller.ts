@@ -60,21 +60,12 @@ export class ProductController {
     const data: UpdateProductDto = req.body;
     const productId = req.params.productId;
 
-    const userId = req.user?.userId;
-    if (!userId) {
-      return res.status(401).json({ error: "No userId" });
-    }
-
     const role = req.user?.role;
     console.log(role);
     if (role !== "admin") {
       return res.status(401).json({ error: "User not have permission" });
     }
-    const result = await this.productService.updateProduct(
-      userId,
-      productId,
-      data
-    );
+    const result = await this.productService.updateProduct(productId, data);
 
     if (result.error) {
       return res.status(400).json({ error: result.error });

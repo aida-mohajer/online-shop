@@ -12,7 +12,7 @@ const wishlistService = new WishlistService();
 const wishlistController = new WishlistController(wishlistService);
 
 wishlistRouter.post(
-  "/add-remove/wishlist/item/:productId",
+  "/add-remove/item/:productId",
   authentication,
   validateProductId,
   async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ wishlistRouter.post(
 );
 
 wishlistRouter.get(
-  "/wishlist/item/:wishlistId",
+  "/item/:wishlistId",
   authentication,
   validateWishlistId,
   async (req: Request, res: Response) => {
@@ -30,7 +30,7 @@ wishlistRouter.get(
 );
 
 wishlistRouter.get(
-  "/wishlist/items",
+  "/items",
   authentication,
   pagination,
   async (req: Request, res: Response) => {

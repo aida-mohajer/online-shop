@@ -12,7 +12,7 @@ const categoryService = new CategoryService();
 const categorycontroller = new CategoryController(categoryService);
 
 categoryRouter.post(
-  "/category",
+  "",
   authentication,
   validateCategoryDto,
   async (req: Request, res: Response) => {
@@ -21,32 +21,29 @@ categoryRouter.post(
 );
 
 categoryRouter.get(
-  "/category/:categoryId",
+  "/:categoryId",
   validateCategoryId,
   async (req: Request, res: Response) => {
     return await categorycontroller.getCategory(req, res);
   }
 );
 
-categoryRouter.get(
-  "/categories",
-  pagination,
-  async (req: Request, res: Response) => {
-    return await categorycontroller.getAllCategories(req, res);
-  }
-);
+categoryRouter.get("", pagination, async (req: Request, res: Response) => {
+  return await categorycontroller.getAllCategories(req, res);
+});
 
 categoryRouter.put(
-  "/category/:categoryId",
+  "/:categoryId",
   authentication,
   validateCategoryId,
+  validateCategoryDto,
   async (req: Request, res: Response) => {
     return await categorycontroller.updateCategory(req, res);
   }
 );
 
 categoryRouter.delete(
-  "/category/:categoryId",
+  "/:categoryId",
   authentication,
   validateCategoryId,
   async (req: Request, res: Response) => {

@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Base } from "./base.entity";
-import { User } from "./user.entity";
 import { Category } from "./category.entity";
 import { CartItem } from "./cartItem.entity";
 import { Wishlist } from "./wishlist.entity";
@@ -29,14 +28,10 @@ export class Product extends Base {
   description!: string;
 
   @Column({ nullable: false })
-  userId!: string;
+  rating!: number;
 
   @Column({ nullable: false })
   categoryId!: string;
-
-  @ManyToOne(() => User, (user) => user.createdProducts)
-  @JoinColumn({ name: "userId" })
-  createdBy!: User;
 
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: "categoryId" })

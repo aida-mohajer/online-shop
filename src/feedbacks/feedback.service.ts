@@ -34,6 +34,13 @@ export class FeedbackService {
         return { error: "Product not found" };
       }
 
+      const existFeedback = await this.feedbackRepository.findOne({
+        where: { userId: userId, productId: productId },
+      });
+      if (existFeedback) {
+        return { error: "You have already a feedback for this product" };
+      }
+
       const feedback = this.feedbackRepository.create({
         userId: user.id,
         productId: product.id,
@@ -42,6 +49,20 @@ export class FeedbackService {
       });
 
       await this.feedbackRepository.save(feedback);
+
+      const rates = await this.feedbackRepository.count({
+        where: { productId: product.id },
+      });
+      const sumOfRatingsResult = await this.feedbackRepository
+        .createQueryBuilder("feedback")
+        .select("SUM(feedback.rating)", "sum")
+        .where("feedback.productId = :productId", { productId: product.id })
+        .getRawOne();
+
+      const sumOfRatings = sumOfRatingsResult?.sum || 0;
+      const avgRate = rates > 0 ? sumOfRatings / rates : 0;
+      product.rating = avgRate;
+      await this.productRepository.save(product);
 
       return {
         rating: feedback.rating,

@@ -14,7 +14,7 @@ const productService = new ProductService();
 const productController = new ProductController(productService);
 
 productRouter.post(
-  "/product/:categoryId",
+  "/:categoryId",
   authentication,
   validateCategoryId,
   validateProductDto,
@@ -24,23 +24,19 @@ productRouter.post(
 );
 
 productRouter.get(
-  "/product/:productId",
+  "/:productId",
   validateProductId,
   async (req: Request, res: Response) => {
     return await productController.getProduct(req, res);
   }
 );
 
-productRouter.get(
-  "/products",
-  pagination,
-  async (req: Request, res: Response) => {
-    return await productController.getAllProducts(req, res);
-  }
-);
+productRouter.get("", pagination, async (req: Request, res: Response) => {
+  return await productController.getAllProducts(req, res);
+});
 
 productRouter.put(
-  "/product/:productId",
+  "/:productId",
   authentication,
   validateProductId,
   validateUpdateProductDto,
@@ -50,7 +46,7 @@ productRouter.put(
 );
 
 productRouter.delete(
-  "/product/:productId",
+  "/:productId",
   authentication,
   validateProductId,
   async (req: Request, res: Response) => {

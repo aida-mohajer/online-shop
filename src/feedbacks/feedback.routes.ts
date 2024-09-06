@@ -13,7 +13,7 @@ const feedbackService = new FeedbackService();
 const feedbackController = new FeebackController(feedbackService);
 
 feedbackRouter.post(
-  "/feedback/:productId",
+  "/:productId",
   authentication,
   validateProductId,
   validateFeedbackDto,
@@ -23,7 +23,7 @@ feedbackRouter.post(
 );
 
 feedbackRouter.get(
-  "/feedbacks/:productId",
+  "/:productId",
   validateProductId,
   pagination,
   async (req: CustomRequest, res: Response) => {
@@ -32,7 +32,7 @@ feedbackRouter.get(
 );
 
 feedbackRouter.put(
-  "/feedback/:feedbackId",
+  "/:feedbackId",
   authentication,
   validateFeedbackId,
   validateFeedbackDto,
@@ -42,7 +42,7 @@ feedbackRouter.put(
 );
 
 feedbackRouter.delete(
-  "/feedback/:feedbackId",
+  "/:feedbackId",
   authentication,
   validateFeedbackId,
   async (req: CustomRequest, res: Response) => {

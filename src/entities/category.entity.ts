@@ -8,7 +8,7 @@ export class Category extends Base {
   id!: string;
 
   @Column({ nullable: false })
-  name!: string;
+  categoryName!: string;
 
   @OneToMany(() => Product, (product) => product.category)
   products!: Product[];

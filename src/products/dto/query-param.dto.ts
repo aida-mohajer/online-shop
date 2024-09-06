@@ -1,4 +1,4 @@
-import { Min, IsInt, IsOptional } from "class-validator";
+import { Min, IsInt } from "class-validator";
 
 export class QueryParamsDto {
   @IsInt()

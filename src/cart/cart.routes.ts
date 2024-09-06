@@ -13,7 +13,7 @@ const cartService = new CartService();
 const cartcontroller = new CartController(cartService);
 
 cartRouter.post(
-  "/cart/item/:productId",
+  "/:productId",
   authentication,
   validateProductId,
   validateCartItemDto,
@@ -23,7 +23,7 @@ cartRouter.post(
 );
 
 cartRouter.get(
-  "/cart/item/:cartId",
+  "/:cartId",
   authentication,
   validateCartId,
   async (req: Request, res: Response) => {
@@ -32,7 +32,7 @@ cartRouter.get(
 );
 
 cartRouter.get(
-  "/cart/items",
+  "",
   authentication,
   pagination,
   async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ cartRouter.get(
 );
 
 cartRouter.put(
-  "/cart/item/:cartId",
+  "/:cartId",
   authentication,
   validateCartId,
   validateCartItemDto,
@@ -51,7 +51,7 @@ cartRouter.put(
 );
 
 cartRouter.delete(
-  "/cart/item/:cartId",
+  "/:cartId",
   authentication,
   validateCartId,
   async (req: Request, res: Response) => {

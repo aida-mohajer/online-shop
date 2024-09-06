@@ -12,7 +12,7 @@ const orderService = new OrderService();
 const orderController = new OrderController(orderService);
 
 orderRouter.post(
-  "/order/:cartId",
+  "/:cartId",
   authentication,
   validateCartId,
   async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ orderRouter.post(
 );
 
 orderRouter.get(
-  "/order/:orderId",
+  "/:orderId",
   authentication,
   validateOrderId,
   async (req: Request, res: Response) => {
@@ -30,7 +30,7 @@ orderRouter.get(
 );
 
 orderRouter.get(
-  "/orders",
+  "",
   authentication,
   pagination,
   async (req: Request, res: Response) => {

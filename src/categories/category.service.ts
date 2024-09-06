@@ -17,7 +17,7 @@ export class CategoryService {
   ): Promise<{ error?: string; message?: string }> {
     try {
       const category = this.categoryRepository.create({
-        name: data.categoryName,
+        categoryName: data.categoryName,
       });
       await this.categoryRepository.save(category);
       return { message: "Category created successfully!" };
@@ -38,7 +38,7 @@ export class CategoryService {
       }
 
       const dto = new ReadGetCategoryDto();
-      (dto.categoryName = category.name),
+      (dto.categoryName = category.categoryName),
         (dto.products = category.products.map((product) => ({
           productName: product.productName,
           description: product.description,
@@ -64,7 +64,7 @@ export class CategoryService {
 
       const categoriesDto: ReadGetCategoryDto[] = allCategories.map(
         (category) => ({
-          categoryName: category.name,
+          categoryName: category.categoryName,
         })
       );
 
@@ -89,7 +89,7 @@ export class CategoryService {
         return { error: "Category not found" };
       }
 
-      // category.name = data.categoryName;
+      // category.categoryName = data.categoryName;
       Object.assign(category, data);
       await this.categoryRepository.save(category);
       return { message: "Category updated successfully!" };

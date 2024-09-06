@@ -26,16 +26,12 @@ usersRouter.post(
     return await userController.login(req, res);
   }
 );
-usersRouter.get(
-  "/get-user",
-  authentication,
-  async (req: Request, res: Response) => {
-    return await userController.getUser(req, res);
-  }
-);
+usersRouter.get("", authentication, async (req: Request, res: Response) => {
+  return await userController.getUser(req, res);
+});
 
 usersRouter.put(
-  "/update-user",
+  "",
   authentication,
   validateUpdateDto,
   async (req: Request, res: Response) => {
@@ -43,10 +39,6 @@ usersRouter.put(
   }
 );
 
-usersRouter.delete(
-  "/delete-user",
-  authentication,
-  async (req: Request, res: Response) => {
-    return await userController.deleteUser(req, res);
-  }
-);
+usersRouter.delete("", authentication, async (req: Request, res: Response) => {
+  return await userController.deleteUser(req, res);
+});
