@@ -38,20 +38,6 @@ export const pagination = async (
     });
   }
 
-  // Check for unexpected properties in the query
-  const allowedProperties = ["page", "limit"];
-  const requestKeys = Object.keys(req.query);
-
-  const hasUnexpectedProperties = requestKeys.some(
-    (key) => !allowedProperties.includes(key)
-  );
-
-  if (hasUnexpectedProperties) {
-    return res.status(400).json({
-      error: "Only page and limit are allowed in the query params.",
-    });
-  }
-
   if (pageParam === undefined || limitParam === undefined) {
     return res.status(400).json({ error: "Page and limit must be provided." });
   }

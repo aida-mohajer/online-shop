@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,6 +14,8 @@ import { CartItem } from "./cartItem.entity";
 import { Wishlist } from "./wishlist.entity";
 import { Feedback } from "./feedback.entity";
 import { Order } from "./order.entity";
+import { ProductImages } from "./product-images.entity";
+import { SubAttributes } from "./subattribues.entity";
 
 @Entity({ name: "product" })
 export class Product extends Base {
@@ -37,6 +41,9 @@ export class Product extends Base {
   @JoinColumn({ name: "categoryId" })
   category!: Category;
 
+  @OneToMany(() => ProductImages, (image) => image.product)
+  images!: ProductImages[];
+
   @OneToMany(() => CartItem, (cartItem) => cartItem.product)
   cartItems!: CartItem[];
 
@@ -48,4 +55,8 @@ export class Product extends Base {
 
   @OneToMany(() => Order, (orderItem) => orderItem.product)
   orderItems!: Order[];
+
+  @ManyToMany(() => SubAttributes, (subAttribute) => subAttribute.products)
+  @JoinTable({ name: "product_subAttributes" })
+  subAttributes!: SubAttributes[];
 }

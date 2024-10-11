@@ -41,6 +41,8 @@
  *                 type: number
  *               role:
  *                 type: string
+ *     security:
+ *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
  *     responses:
  *       201:
  *         description: User created successfully
@@ -68,6 +70,8 @@
  *                 type: string
  *               password:
  *                 type: string
+ *     security:
+ *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
  *     responses:
  *       200:
  *         description: User logged in successfully
@@ -79,11 +83,18 @@
 
 /**
  * @swagger
- * /api/users:
+ * /api/users/{userId}:
  *   get:
  *     summary: Get the authenticated user
  *     description: This endpoint retrieves the details of the authenticated user.
  *     tags: [Users]
+ *     parameters:
+ *       - name: userId
+ *         in: path
+ *         required: true
+ *         description: ID of the user to retrieve
+ *         schema:
+ *           type: string
  *     security:
  *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
  *     responses:
@@ -112,6 +123,10 @@
  *               username:
  *                 type: string
  *               email:
+ *                 type: string
+ *               age:
+ *                 type: number
+ *               password:
  *                 type: string
  *     responses:
  *       200:

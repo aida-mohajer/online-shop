@@ -72,21 +72,6 @@
  *     summary: Get all items in the wishlist
  *     description: This endpoint retrieves all items in the user's wishlist.
  *     tags: [Wishlist]
- *     parameters:
- *       - name: page
- *         in: query
- *         description: Page number for pagination
- *         required: false
- *         schema:
- *           type: integer
- *           default: 1
- *       - name: limit
- *         in: query
- *         description: Number of blogs per page
- *         required: false
- *         schema:
- *           type: integer
- *           default: 10
  *     security:
  *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
  *     responses:

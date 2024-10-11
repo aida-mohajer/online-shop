@@ -2,7 +2,6 @@ import { AppDataSource } from "../data-source";
 import { CartItem } from "../entities/cartItem.entity";
 import { Product } from "../entities/product.entity";
 import { User } from "../entities/user.entity";
-import { Pagination } from "../middlewares/pagination";
 import { CartItemDto } from "./dto/cartItem.dto";
 import { ReadGetCartItemDto } from "./dto/read-get-cartItem.dto";
 import { ReadGetAllCartItems } from "./dto/read-getAll-cartItems.dto";
@@ -86,38 +85,40 @@ export class CartService {
     }
   }
 
-  async getAllCartItems(
-    pagination: Pagination,
-    userId: string
-  ): Promise<ReadGetAllCartItems> {
-    const { skip, limit } = pagination;
+  async getAllCartItems(userId: string): Promise<ReadGetAllCartItems> {
     try {
-      const [allCartItems, totalCartItems] = await this.cartItemRepository
-        .createQueryBuilder("cart")
-        .leftJoinAndSelect("cart.product", "product")
-        .where("cart.userId = :userId", { userId })
-        .skip(skip)
-        .take(limit)
-        .getManyAndCount();
+      const queryBuilder = this.cartItemRepository
+        .createQueryBuilder("cartItem")
+        .leftJoinAndSelect("cartItem.product", "product")
+        .select([
+          "cartItem.id",
+          "cartItem.quantity",
+          "cartItem.createdAt",
+          "product.productName",
+          "product.price",
+          "product.description",
+        ])
+        .where("cartItem.userId = :userId", { userId })
+        .orderBy("product.price", "DESC");
 
-      const cartItemsDto: ReadGetCartItemDto[] = allCartItems.map(
-        (cartItem) => ({
-          products: {
-            productName: cartItem.product.productName,
-            price: cartItem.product.price,
-            description: cartItem.product.description,
-            quantity: cartItem.quantity,
-            addedAt: cartItem.createdAt,
-          },
-          totalPrice: cartItem.quantity * cartItem.product.price,
-        })
-      );
+      const [allCartItems, totalCartItems] =
+        await queryBuilder.getManyAndCount();
 
-      const totalPages = Math.ceil(totalCartItems / limit);
+      const cartItemsWithTotalPrice = allCartItems.map((cartItem) => ({
+        ...cartItem,
+        totalPrice: cartItem.quantity * cartItem.product.price,
+      }));
 
-      return { cartItemDto: cartItemsDto, totalPages, totalCartItems };
+      return {
+        message:
+          totalCartItems > 0
+            ? "Cart items retrieved successfully"
+            : "No cart items found matching the search criteria.",
+        response: cartItemsWithTotalPrice,
+        totalCartItems,
+      };
     } catch (error) {
-      console.error("Error during retrieve categories:", error);
+      console.error("Error during retrieve cartItems:", error);
       return { error: "Internal server error" };
     }
   }
@@ -138,7 +139,6 @@ export class CartService {
         return { error: "You are not authorized to update this cart item" };
       }
       Object.assign(cartItem, data);
-      // cartItem.quantity = data.quantity;
       await this.cartItemRepository.save(cartItem);
       return { message: "Cart updated successfully!" };
     } catch (error) {

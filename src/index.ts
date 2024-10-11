@@ -12,13 +12,29 @@ import { orderRouter } from "./order/order.routes";
 import { feedbackRouter } from "./feedbacks/feedback.routes";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import path = require("path");
+import path from "path";
+import { productImageRouter } from "./product-images/product-image.routes";
+import { uploadImageRouter } from "./upload/image.routes";
+import { attributeRouter } from "./attributes/attribute.routes";
+import { subAttrRouter } from "./sub-attributes/sub-attr.routes";
+import cookieParser from "cookie-parser";
+import "./cron-jobs";
 
 dotenv.config();
 
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
-app.use(errorHandler);
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  "/originals",
+  express.static(path.join(__dirname, "../src/public/images/originals"))
+);
+app.use(
+  "/optimized",
+  express.static(path.join(__dirname, "../src/public/images/optimized"))
+);
+
 app.use("/api/users/", usersRouter);
 app.use("/api/products/", productRouter);
 app.use("/api/categories/", categoryRouter);
@@ -26,6 +42,12 @@ app.use("/api/cart-items/", cartRouter);
 app.use("/api/wishlist/", wishlistRouter);
 app.use("/api/orders/", orderRouter);
 app.use("/api/feedbacks/", feedbackRouter);
+app.use("/api/images/", uploadImageRouter);
+app.use("/api/product/images/", productImageRouter);
+app.use("/api/attributes/", attributeRouter);
+app.use("/api/sub-attr/", subAttrRouter);
+
+app.use(errorHandler);
 
 // Swagger configuration
 const swaggerOptions = {
@@ -41,6 +63,15 @@ const swaggerOptions = {
         url: `http://localhost:${process.env.PORT || 3000}`,
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: [path.join(__dirname, "./swagger/*.ts")],
   securityDefinitions: {

@@ -14,6 +14,46 @@
  *       scheme: bearer
  *       bearerFormat: JWT
  */
+/**
+ * @swagger
+ * /api/cart-items/{cartId}:
+ *   get:
+ *     summary: Get a specific cart item
+ *     description: This endpoint retrieves a specific item in the user's cart by its ID.
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
+ *     parameters:
+ *       - name: cartId
+ *         in: path
+ *         required: true
+ *         description: ID of the cart item to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cart item retrieved successfully
+ *       401:
+ *         description: Unauthorized, user not authenticated
+ *       404:
+ *         description: Cart item not found
+ */
+
+/**
+ * @swagger
+ * /api/cart-items:
+ *   get:
+ *     summary: Get all cart items
+ *     description: This endpoint retrieves all items in the user's cart with pagination.
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
+ *     responses:
+ *       200:
+ *         description: List of cart items retrieved successfully
+ *       401:
+ *         description: Unauthorized, user not authenticated
+ */
 
 /**
  * @swagger
@@ -50,66 +90,9 @@
  *       404:
  *         description: Product not found
  */
-
 /**
  * @swagger
  * /api/cart-items/{cartId}:
- *   get:
- *     summary: Get a specific cart item
- *     description: This endpoint retrieves a specific item in the user's cart by its ID.
- *     tags: [Cart]
- *     security:
- *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
- *     parameters:
- *       - name: cartId
- *         in: path
- *         required: true
- *         description: ID of the cart item to retrieve
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Cart item retrieved successfully
- *       401:
- *         description: Unauthorized, user not authenticated
- *       404:
- *         description: Cart item not found
- */
-
-/**
- * @swagger
- * /api/cart-items:
- *   get:
- *     summary: Get all cart items
- *     description: This endpoint retrieves all items in the user's cart with pagination.
- *     tags: [Cart]
- *     parameters:
- *       - name: page
- *         in: query
- *         description: Page number for pagination
- *         required: false
- *         schema:
- *           type: integer
- *           default: 1
- *       - name: limit
- *         in: query
- *         description: Number of blogs per page
- *         required: false
- *         schema:
- *           type: integer
- *           default: 10
- *     security:
- *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
- *     responses:
- *       200:
- *         description: List of cart items retrieved successfully
- *       401:
- *         description: Unauthorized, user not authenticated
- */
-
-/**
- * @swagger
- * /api/cart-item/{cartId}:
  *   put:
  *     summary: Update a specific cart item
  *     description: This endpoint allows authenticated users to update a cart item by its ID.
@@ -145,7 +128,7 @@
 
 /**
  * @swagger
- * /api/cart-item/{cartId}:
+ * /api/cart-items/{cartId}:
  *   delete:
  *     summary: Delete a specific cart item
  *     description: This endpoint allows authenticated users to delete a cart item by its ID.

@@ -1,7 +1,6 @@
 import { AppDataSource } from "../data-source";
 import { CartItem } from "../entities/cartItem.entity";
 import { Order } from "../entities/order.entity";
-import { Pagination } from "../middlewares/pagination";
 import { ReadGetOrderDto } from "./dto/read-get-order.dto";
 import { ReadGetAllOrders } from "./dto/read-getAll-orders.dto";
 import { ReadMakeOrderDto } from "./dto/read-make-order.dto";
@@ -64,34 +63,37 @@ export class OrderService {
     }
   }
 
-  async getAllOrders(
-    pagination: Pagination,
-    userId: string
-  ): Promise<ReadGetAllOrders> {
-    const { skip, limit } = pagination;
+  async getAllOrders(userId: string): Promise<ReadGetAllOrders> {
     try {
-      const [orders, totalOrders] = await this.orderRepository
+      const queryBuilder = this.orderRepository
         .createQueryBuilder("order")
         .leftJoinAndSelect("order.product", "product")
+        .select([
+          "product.productName",
+          "product.price",
+          "product.description",
+          "order.id",
+          "order.createdAt",
+          "order.quantity",
+        ])
         .where("order.userId = :userId", { userId })
-        .skip(skip)
-        .take(limit)
-        .getManyAndCount();
+        .orderBy("order.createdAt");
 
-      const orderItemsDto: ReadGetOrderDto[] = orders.map((order) => ({
-        products: {
-          productName: order.product.productName,
-          price: order.product.price,
-          description: order.product.description,
-          createdAt: order.createdAt,
-        },
-        quantity: order.quantity,
+      const [orders, totalOrders] = await queryBuilder.getManyAndCount();
+
+      const ordersWithTotalPrice = orders.map((order) => ({
+        ...order,
         totalPrice: order.quantity * order.product.price,
       }));
 
-      const totalPages = Math.ceil(totalOrders / limit);
-
-      return { orderItemDto: orderItemsDto, totalPages, totalOrders };
+      return {
+        message:
+          totalOrders > 0
+            ? "Orders items retrieved successfully"
+            : "No order item found matching the search criteria.",
+        response: ordersWithTotalPrice,
+        totalOrders,
+      };
     } catch (error) {
       console.error("Error during retrieve order items:", error);
       return { error: "Internal server error" };

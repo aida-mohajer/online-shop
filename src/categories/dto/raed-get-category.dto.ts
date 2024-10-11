@@ -1,9 +1,9 @@
 export class ReadGetCategoryDto {
+  id?: string;
   categoryName?: string;
-  products?: {
-    productName: string;
-    description: string;
-    price?: number;
+  subCategories?: {
+    id: string;
+    categoryName: string;
   }[];
   error?: string;
 }

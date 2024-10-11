@@ -9,12 +9,12 @@ import {
 } from "class-validator";
 
 export class SignupDto {
-  @Length(4, 10)
+  @Length(4, 20)
   @IsString()
   username!: string;
   @IsEmail()
   email!: string;
-  @Length(5, 8)
+  @Length(5, 15)
   @IsString()
   password!: string;
   @IsInt()

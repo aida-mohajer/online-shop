@@ -1,8 +1,8 @@
-import { ReadGetCartItemDto } from "./read-get-cartItem.dto";
+import { CartItem } from "../../entities/cartItem.entity";
 
 export class ReadGetAllCartItems {
-  cartItemDto?: ReadGetCartItemDto[];
-  totalPages?: number;
+  response?: CartItem[];
   totalCartItems?: number;
+  message?: string;
   error?: string;
 }

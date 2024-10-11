@@ -20,18 +20,5 @@ export const validateCategoryDto = async (
     });
   }
 
-  const allowedProperties = ["categoryName"];
-  const requestKeys = Object.keys(req.body);
-
-  const hasUnexpectedProperties = requestKeys.some(
-    (key) => !allowedProperties.includes(key)
-  );
-
-  if (hasUnexpectedProperties) {
-    return res.status(400).json({
-      error: "Only categoryName allowed in the request body.",
-    });
-  }
-
   next();
 };

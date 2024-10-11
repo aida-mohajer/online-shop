@@ -10,7 +10,6 @@ export class OrderController {
       return res.status(401).json({ error: "No userId" });
     }
     const cartId = req.params.cartId;
-    const productId = req.params.productId;
 
     const result = await this.orderService.createOrder(cartId, userId);
 
@@ -35,18 +34,12 @@ export class OrderController {
   }
 
   async getAllOrders(req: CustomRequest, res: Response): Promise<Response> {
-    const pagination = req.pagination;
-    if (!pagination) {
-      return res
-        .status(400)
-        .json({ error: "Pagination parameters are missing" });
-    }
     const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({ error: "No userId" });
     }
     try {
-      const result = await this.orderService.getAllOrders(pagination, userId);
+      const result = await this.orderService.getAllOrders(userId);
       return res.status(201).json(result);
     } catch (error) {
       console.error("Error retrieving order items:", error);

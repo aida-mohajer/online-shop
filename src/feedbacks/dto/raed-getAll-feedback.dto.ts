@@ -1,8 +1,9 @@
-import { ReadFeedbackDto } from "./read-feedback.dto";
+import { Feedback } from "../../entities/feedback.entity";
 
 export class ReadGetAllFeedbackDto {
-  feedbackDto?: ReadFeedbackDto[];
+  response?: Feedback[];
   totalPages?: number;
   totalFeedback?: number;
+  message?: string;
   error?: string;
 }

@@ -2,8 +2,11 @@ import dotenv from "dotenv";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { Pagination } from "./pagination";
+import { Search } from "./search";
 
 dotenv.config();
+
+type MulterFile = Express.Multer.File;
 
 export interface CustomRequest extends Request {
   user?: {
@@ -11,6 +14,8 @@ export interface CustomRequest extends Request {
     role: string;
   };
   pagination?: Pagination;
+  search?: Search;
+  files?: MulterFile[] | { [fieldname: string]: MulterFile[] };
 }
 
 export const authentication = (

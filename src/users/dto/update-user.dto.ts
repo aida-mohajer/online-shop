@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -10,14 +11,14 @@ import {
 
 export class UpdateUserDto {
   @IsOptional()
-  @Length(4, 10)
+  @Length(4, 20)
   @IsString()
   username?: string;
   @IsOptional()
   @IsEmail()
   email?: string;
   @IsOptional()
-  @Length(5, 8)
+  @Length(5, 20)
   @IsString()
   password?: string;
   @IsOptional()
@@ -25,4 +26,7 @@ export class UpdateUserDto {
   @Min(7)
   @Max(99)
   age?: number;
+  @IsOptional()
+  @IsIn(["admin", "user"])
+  role?: string;
 }

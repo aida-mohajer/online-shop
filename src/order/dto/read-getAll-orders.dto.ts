@@ -1,8 +1,8 @@
-import { ReadGetOrderDto } from "./read-get-order.dto";
+import { Order } from "../../entities/order.entity";
 
 export class ReadGetAllOrders {
-  orderItemDto?: ReadGetOrderDto[];
-  totalPages?: number;
+  response?: Order[];
   totalOrders?: number;
+  message?: string;
   error?: string;
 }

@@ -76,21 +76,6 @@
  *     summary: Get all orders
  *     description: This endpoint retrieves all orders for the authenticated user with pagination.
  *     tags: [Orders]
- *     parameters:
- *       - name: page
- *         in: query
- *         description: Page number for pagination
- *         required: false
- *         schema:
- *           type: integer
- *           default: 1
- *       - name: limit
- *         in: query
- *         description: Number of blogs per page
- *         required: false
- *         schema:
- *           type: integer
- *           default: 10
  *     security:
  *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
  *     responses:

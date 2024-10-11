@@ -33,6 +33,8 @@
  *             properties:
  *               categoryName:
  *                 type: string
+ *               parentCategoryId:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Category created successfully
@@ -71,20 +73,12 @@
  *     description: This endpoint retrieves all categories with pagination.
  *     tags: [Categories]
  *     parameters:
- *       - name: page
+ *       - name: categoryName
  *         in: query
- *         description: Page number for pagination
+ *         description: Filter categories by name
  *         required: false
  *         schema:
- *           type: integer
- *           default: 1
- *       - name: limit
- *         in: query
- *         description: Number of blogs per page
- *         required: false
- *         schema:
- *           type: integer
- *           default: 10
+ *           type: string
  *     responses:
  *       200:
  *         description: List of categories retrieved successfully
@@ -151,4 +145,34 @@
  *         description: Unauthorized, user not authenticated
  *       404:
  *         description: Category not found
+ */
+/**
+ * @swagger
+ * /api/categories/{categoryId}/attr/{attrId}:
+ *   delete:
+ *     summary: Delete an attribute from a category
+ *     description: This endpoint allows authenticated users to delete an attribute from a specific category.
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: categoryId
+ *         in: path
+ *         required: true
+ *         description: ID of the category from which to delete the attribute
+ *         schema:
+ *           type: string
+ *       - name: attrId
+ *         in: path
+ *         required: true
+ *         description: ID of the attribute to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Attribute deleted successfully
+ *       401:
+ *         description: Unauthorized access
+ *       404:
+ *         description: Category or attribute not found
  */

@@ -6,6 +6,7 @@ import { validateSignupDto } from "./validations/signup.validation";
 import { validateLoginDto } from "./validations/login.validations";
 import { authentication } from "../middlewares/authentication";
 import { validateUpdateDto } from "./validations/update-user.validation";
+import { validateUserId } from "./validations/userId.validation";
 
 export const usersRouter = express.Router();
 const userService = new UserService();
@@ -26,9 +27,13 @@ usersRouter.post(
     return await userController.login(req, res);
   }
 );
-usersRouter.get("", authentication, async (req: Request, res: Response) => {
-  return await userController.getUser(req, res);
-});
+usersRouter.get(
+  "/:userId",
+  validateUserId,
+  async (req: Request, res: Response) => {
+    return await userController.getUser(req, res);
+  }
+);
 
 usersRouter.put(
   "",

@@ -1,7 +1,10 @@
-import { IsString, Length } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class CategoryDto {
   @IsString()
-  @Length(4, 10)
   categoryName!: string;
+
+  @IsString()
+  @IsOptional()
+  parentCategoryId?: string | null;
 }

@@ -1,8 +1,11 @@
-import { ReadGetCategoryDto } from "./read-get-product.dto";
-
 export class ReadGetAllCategories {
-  categoryDto?: ReadGetCategoryDto[];
-  totalPages?: number;
+  response?: {
+    id: string;
+    categoryName: string;
+    parentCategoryId: string | null;
+  }[];
+
   totalCategories?: number;
+  message?: string;
   error?: string;
 }

@@ -36,18 +36,12 @@ export class CartController {
   }
 
   async getAllCartItems(req: CustomRequest, res: Response): Promise<Response> {
-    const pagination = req.pagination;
-    if (!pagination) {
-      return res
-        .status(400)
-        .json({ error: "Pagination parameters are missing" });
-    }
     const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     try {
-      const result = await this.cartService.getAllCartItems(pagination, userId);
+      const result = await this.cartService.getAllCartItems(userId);
       return res.status(201).json(result);
     } catch (error) {
       console.error("Error retrieving cart items:", error);

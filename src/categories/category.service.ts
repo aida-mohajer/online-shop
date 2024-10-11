@@ -2,23 +2,47 @@ import { EntityManager, In } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { Category } from "../entities/category.entity";
 import { Product } from "../entities/product.entity";
-import { Pagination } from "../middlewares/pagination";
 import { CategoryDto } from "./dto/category.dto";
-import { ReadGetCategoryDto } from "./dto/read-get-product.dto";
 import { ReadGetAllCategories } from "./dto/read-getAll-categories.dto";
 import { Order } from "../entities/order.entity";
+import { Search } from "../middlewares/search";
+import { User } from "../entities/user.entity";
+import { ReadGetCategoryDto } from "./dto/raed-get-category.dto";
+import { UpdateCategoryDto } from "./dto/update-category.dto";
+import { CategoryViewLog } from "../entities/category-view.entity";
 
 export class CategoryService {
   constructor(
-    private categoryRepository = AppDataSource.getRepository(Category)
+    private categoryRepository = AppDataSource.getRepository(Category),
+    private userRepository = AppDataSource.getRepository(User),
+    private catViewRepository = AppDataSource.getRepository(CategoryViewLog)
   ) {}
   async createCategory(
+    userId: string,
     data: CategoryDto
   ): Promise<{ error?: string; message?: string }> {
     try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        return { error: "User not found" };
+      }
+
+      let parentCategory = null;
+      if (data.parentCategoryId) {
+        parentCategory = await this.categoryRepository.findOne({
+          where: { id: data.parentCategoryId },
+        });
+        if (!parentCategory) {
+          return { error: "Parent category not found" };
+        }
+      }
       const category = this.categoryRepository.create({
         categoryName: data.categoryName,
+        parentCategory,
       });
+
       await this.categoryRepository.save(category);
       return { message: "Category created successfully!" };
     } catch (error) {
@@ -31,46 +55,58 @@ export class CategoryService {
     try {
       const category = await this.categoryRepository.findOne({
         where: { id: categoryId },
-        relations: ["products"],
+        relations: ["subcategories"],
       });
+
       if (!category) {
         return { error: "Category not found" };
       }
 
-      const dto = new ReadGetCategoryDto();
-      (dto.categoryName = category.categoryName),
-        (dto.products = category.products.map((product) => ({
-          productName: product.productName,
-          description: product.description,
-          price: product.price,
-        })));
-      return dto;
+      return {
+        id: category.id,
+        categoryName: category.categoryName,
+        subCategories: category?.subcategories.map((subcategory) => ({
+          id: subcategory.id,
+          categoryName: subcategory.categoryName,
+        })),
+      };
     } catch (error) {
       console.error("Error during retrieve a category", error);
-      return { error: "An unexpected error occured" };
+      return { error: "An unexpected error occurred" };
     }
   }
 
-  async getAllCategories(
-    pagination: Pagination
-  ): Promise<ReadGetAllCategories> {
-    const { skip, limit } = pagination;
+  async getAllCategories(search?: Search): Promise<ReadGetAllCategories> {
+    const { categoryName = "" } = search || {};
     try {
-      const [allCategories, totalCategories] = await this.categoryRepository
-        .createQueryBuilder("categories")
-        .skip(skip)
-        .take(limit)
-        .getManyAndCount();
+      const queryBuilder = this.categoryRepository
+        .createQueryBuilder("category")
+        .where("category.parentCategoryId IS NULL")
+        .orderBy("category.categoryName", "ASC");
 
-      const categoriesDto: ReadGetCategoryDto[] = allCategories.map(
-        (category) => ({
-          categoryName: category.categoryName,
-        })
-      );
+      if (categoryName) {
+        queryBuilder.where("category.categoryName LIKE :searchTerm", {
+          searchTerm: `%${categoryName}%`,
+        });
+      }
 
-      const totalPages = Math.ceil(totalCategories / limit);
+      const [allCategories, totalCategories] =
+        await queryBuilder.getManyAndCount();
 
-      return { categoryDto: categoriesDto, totalPages, totalCategories };
+      const response = allCategories.map((category) => ({
+        id: category.id,
+        categoryName: category.categoryName,
+        parentCategoryId: category.parentCategoryId,
+      }));
+
+      return {
+        message:
+          totalCategories > 0
+            ? "Categories retrieved successfully"
+            : "No categories found matching the search criteria.",
+        response,
+        totalCategories,
+      };
     } catch (error) {
       console.error("Error during retrieve categories:", error);
       return { error: "Internal server error" };
@@ -78,10 +114,17 @@ export class CategoryService {
   }
 
   async updateCategory(
-    data: CategoryDto,
+    userId: string,
+    data: UpdateCategoryDto,
     categoryId: string
   ): Promise<{ error?: string; message?: string }> {
     try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        return { error: "User not found" };
+      }
       const category = await this.categoryRepository.findOne({
         where: { id: categoryId },
       });
@@ -89,8 +132,8 @@ export class CategoryService {
         return { error: "Category not found" };
       }
 
-      // category.categoryName = data.categoryName;
       Object.assign(category, data);
+
       await this.categoryRepository.save(category);
       return { message: "Category updated successfully!" };
     } catch (error) {
@@ -100,12 +143,19 @@ export class CategoryService {
   }
 
   async deleteCategory(
+    userId: string,
     categoryId: string
   ): Promise<{ error?: string; message?: string }> {
     const entityManager = AppDataSource.createEntityManager();
     return await entityManager.transaction(
       async (transactionalEntityManager: EntityManager) => {
         try {
+          const user = await this.userRepository.findOne({
+            where: { id: userId },
+          });
+          if (!user) {
+            return { error: "User not found" };
+          }
           const category = await transactionalEntityManager.findOne(Category, {
             where: { id: categoryId },
           });
@@ -136,5 +186,49 @@ export class CategoryService {
         }
       }
     );
+  }
+  async handleCategoryView(
+    categoryId: string,
+    ipAddress: string,
+    currentTime: number,
+    cooldown: number
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const category = await this.categoryRepository.findOne({
+        where: { id: categoryId },
+      });
+
+      if (!category) {
+        return { success: false, error: "Category not found" };
+      }
+      const recentView = await this.catViewRepository
+        .createQueryBuilder()
+        .where("categoryId = :categoryId", { categoryId })
+        .andWhere("ipAddress = :ipAddress", { ipAddress })
+        .andWhere("viewedAt > :recentTime", {
+          recentTime: new Date(currentTime - cooldown),
+        })
+        .getOne();
+
+      if (!recentView) {
+        await this.categoryRepository.increment(
+          { id: categoryId },
+          "viewCount",
+          1
+        );
+
+        const newView = this.catViewRepository.create({
+          category,
+          ipAddress,
+          viewedAt: new Date(currentTime),
+        });
+        await this.catViewRepository.save(newView);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling category view:", error);
+      return { success: false, error: "Internal server error" };
+    }
   }
 }

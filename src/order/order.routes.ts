@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import express from "express";
 import { authentication } from "../middlewares/authentication";
-import { pagination } from "../middlewares/pagination";
 import { OrderService } from "./order.service";
 import { OrderController } from "./order.controller";
 import { validateCartId } from "../cart/validations/cartId.validation";
@@ -29,11 +28,6 @@ orderRouter.get(
   }
 );
 
-orderRouter.get(
-  "",
-  authentication,
-  pagination,
-  async (req: Request, res: Response) => {
-    return await orderController.getAllOrders(req, res);
-  }
-);
+orderRouter.get("", authentication, async (req: Request, res: Response) => {
+  return await orderController.getAllOrders(req, res);
+});

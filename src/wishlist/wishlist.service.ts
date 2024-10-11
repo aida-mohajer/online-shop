@@ -2,7 +2,6 @@ import { AppDataSource } from "../data-source";
 import { Product } from "../entities/product.entity";
 import { User } from "../entities/user.entity";
 import { Wishlist } from "../entities/wishlist.entity";
-import { Pagination } from "../middlewares/pagination";
 import { ReadAddWishlistItemDto } from "./dto/read-add-wishlist-item.dto";
 import { ReadGetWishlistItemDto } from "./dto/read-get-wishlist-item.dto";
 import { ReadGetAllWishlistItems } from "./dto/read-getAll-wishlist-items.dto";
@@ -85,33 +84,33 @@ export class WishlistService {
     }
   }
 
-  async getAllItems(
-    pagination: Pagination,
-    userId: string
-  ): Promise<ReadGetAllWishlistItems> {
-    const { skip, limit } = pagination;
+  async getAllItems(userId: string): Promise<ReadGetAllWishlistItems> {
     try {
+      const queryBuilder = this.wishlistRepository
+        .createQueryBuilder("wishlist")
+        .leftJoinAndSelect("wishlist.product", "product")
+        .select([
+          "wishlist.id",
+          "product.id",
+          "product.productName",
+          "product.price",
+          "product.description",
+          "wishlist.createdAt",
+        ])
+        .where("wishlist.userId = :userId", { userId })
+        .orderBy("product.price", "DESC");
+
       const [allWishlistItems, totalWishlistItems] =
-        await this.wishlistRepository
-          .createQueryBuilder("wishlist")
-          .leftJoinAndSelect("wishlist.product", "product")
-          .where("wishlist.userId = :userId", { userId })
-          .skip(skip)
-          .take(limit)
-          .getManyAndCount();
+        await queryBuilder.getManyAndCount();
 
-      const wishlistItemsDto: ReadGetWishlistItemDto[] = allWishlistItems.map(
-        (wishlistItem) => ({
-          productName: wishlistItem.product.productName,
-          price: wishlistItem.product.price,
-          description: wishlistItem.product.description,
-          addedAt: wishlistItem.createdAt,
-        })
-      );
-
-      const totalPages = Math.ceil(totalWishlistItems / limit);
-
-      return { wishlistDto: wishlistItemsDto, totalPages, totalWishlistItems };
+      return {
+        message:
+          totalWishlistItems > 0
+            ? "Wishlist items retrieved successfully"
+            : "No wishlist items found matching the search criteria.",
+        response: allWishlistItems,
+        totalWishlistItems,
+      };
     } catch (error) {
       console.error("Error during retrieve wishlist items:", error);
       return { error: "Internal server error" };

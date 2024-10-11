@@ -1,8 +1,8 @@
-import { ReadGetWishlistItemDto } from "./read-get-wishlist-item.dto";
+import { Wishlist } from "../../entities/wishlist.entity";
 
 export class ReadGetAllWishlistItems {
-  wishlistDto?: ReadGetWishlistItemDto[];
-  totalPages?: number;
+  response?: Wishlist[];
   totalWishlistItems?: number;
+  message?: string;
   error?: string;
 }

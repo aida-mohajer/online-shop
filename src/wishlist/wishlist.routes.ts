@@ -32,7 +32,6 @@ wishlistRouter.get(
 wishlistRouter.get(
   "/items",
   authentication,
-  pagination,
   async (req: Request, res: Response) => {
     return await wishlistController.getAllItems(req, res);
   }

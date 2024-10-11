@@ -7,33 +7,41 @@ export const validateUpdateProductDto = async (
   res: Response,
   next: NextFunction
 ) => {
-  const productDto = Object.assign(new UpdateProductDto(), req.body);
-  const errors = await validate(productDto);
-  console.log(productDto);
+  const updateProductDto = Object.assign(new UpdateProductDto(), req.body);
 
-  if (errors.length > 0) {
+  const productErrors = await validate(updateProductDto);
+
+  if (productErrors.length > 0) {
     return res.status(400).json({
       error: "Validation failed",
-      details: errors.map((err) => ({
+      details: productErrors.map((err) => ({
         property: err.property,
         constraints: err.constraints,
       })),
     });
   }
 
-  const allowedProperties = ["productName", "price", "description"];
-  const requestKeys = Object.keys(req.body);
+  // Validate each attribute in the attributes array
+  // const attributeErrors = await Promise.all(
+  //   updateProductDto.attributes.map(async (attr: string) => {
+  //     const attrDto = Object.assign(new UpdateProductDto(), attr);
+  //     return validate(attrDto);
+  //   })
+  // );
 
-  const hasUnexpectedProperties = requestKeys.some(
-    (key) => !allowedProperties.includes(key)
-  );
+  // // Flatten the array of attribute errors
+  // const flattenedAttrErrors = attributeErrors.flat();
 
-  if (hasUnexpectedProperties) {
-    return res.status(400).json({
-      error:
-        "Only productName, price and description are allowed in the request body.",
-    });
-  }
+  // // If there are validation errors in attribute fields
+  // if (flattenedAttrErrors.length > 0) {
+  //   return res.status(400).json({
+  //     error: "Validation failed for attributes",
+  //     details: flattenedAttrErrors.map((err) => ({
+  //       property: `attributes[${err.property}]`,
+  //       constraints: err.constraints,
+  //     })),
+  //   });
+  // }
 
   next();
 };

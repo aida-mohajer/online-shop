@@ -89,21 +89,30 @@ export class FeedbackService {
       }
       const [allFeedback, totalFeedback] = await this.feedbackRepository
         .createQueryBuilder("feedback")
-        .leftJoinAndSelect("feedback.user", "user")
+        .select([
+          "feedback.id",
+          "feedback.comment",
+          "feedback.rating",
+          "feedback.userId",
+          "feedback.productId",
+          "feedback.createdAt",
+        ])
         .where("feedback.productId = :productId", { productId: productId })
         .skip(skip)
         .take(limit)
         .getManyAndCount();
 
-      const feedbackDto: ReadFeedbackDto[] = allFeedback.map((feedback) => ({
-        userName: feedback.user.username,
-        rating: feedback.rating,
-        comment: feedback.comment,
-      }));
-
       const totalPages = Math.ceil(totalFeedback / limit);
 
-      return { feedbackDto, totalPages, totalFeedback };
+      return {
+        message:
+          totalFeedback > 0
+            ? "Feedbacks retrieved successfully"
+            : "No feedback found.",
+        response: allFeedback,
+        totalPages,
+        totalFeedback,
+      };
     } catch (error) {
       console.error("Error fetching feedbacks:", error);
       return { error: "Internal server error" };

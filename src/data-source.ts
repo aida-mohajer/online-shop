@@ -8,6 +8,10 @@ import { CartItem } from "./entities/cartItem.entity";
 import { Wishlist } from "./entities/wishlist.entity";
 import { Order } from "./entities/order.entity";
 import { Feedback } from "./entities/feedback.entity";
+import { ProductImages } from "./entities/product-images.entity";
+import { Attribute } from "./entities/attribute.entity";
+import { SubAttributes } from "./entities/subattribues.entity";
+import { CategoryViewLog } from "./entities/category-view.entity";
 
 dotenv.config();
 
@@ -25,8 +29,21 @@ export const AppDataSource = new DataSource({
   database: DB_DATABASE,
 
   synchronize: true,
-  logging: NODE_ENV === "dev",
-  entities: [User, Product, Category, CartItem, Wishlist, Order, Feedback],
+  // logging: NODE_ENV === "dev",
+  logging: true,
+  entities: [
+    User,
+    Product,
+    Category,
+    CartItem,
+    Wishlist,
+    Order,
+    Feedback,
+    ProductImages,
+    Attribute,
+    SubAttributes,
+    CategoryViewLog,
+  ],
   migrations: [__dirname + "/migration/*.ts"],
   subscribers: [],
   options: {

@@ -24,20 +24,17 @@ export class UserController {
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
-    return res.status(201).json(result);
+    return res.status(200).json(result);
   }
 
   async getUser(req: CustomRequest, res: Response): Promise<Response> {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return res.status(401).json({ error: "No userId" });
-    }
+    const userId = req.params.userId;
     const result = await this.userService.getUser(userId);
 
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
-    return res.status(201).json(result);
+    return res.status(200).json(result);
   }
 
   async updateUser(req: CustomRequest, res: Response): Promise<Response> {
@@ -64,6 +61,6 @@ export class UserController {
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
-    return res.status(201).json(result);
+    return res.status(200).json(result);
   }
 }
