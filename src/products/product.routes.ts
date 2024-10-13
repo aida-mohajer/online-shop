@@ -11,6 +11,7 @@ import { validateProductDto } from "./validations/product.validation";
 import { search } from "../middlewares/search";
 import { validateQuerySubAttrIds } from "./validations/subAttrIds-query.validation";
 import { trackCategoryView } from "../middlewares/category-views";
+import { validateVersionId } from "./validations/versionId.validation";
 
 export const productRouter = express.Router();
 const productService = new ProductService();
@@ -72,6 +73,25 @@ productRouter.put(
   validateUpdateProductDto,
   async (req: Request, res: Response) => {
     return await productController.updateProduct(req, res);
+  }
+);
+
+productRouter.get(
+  "/:productId/versions",
+  authentication,
+  validateProductId,
+  async (req: Request, res: Response) => {
+    return await productController.getProductVersions(req, res);
+  }
+);
+
+productRouter.post(
+  "/:productId/version/:versionId",
+  authentication,
+  validateProductId,
+  validateVersionId,
+  async (req: Request, res: Response) => {
+    return await productController.setProductVersion(req, res);
   }
 );
 

@@ -186,22 +186,6 @@
  *                 type: string
  *               price:
  *                 type: number
- *               attributes:
- *                 type: array
- *                 description: List of attributes associated with the product.
- *                 items:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       description: Unique identifier for the attribute (UUID format)
- *                       example: "e7f3a1d1-3f1b-4c8e-b6b0-5e2f3c5d7a8e"  # Example UUID for attribute ID
- *                     value:
- *                       type: string
- *                       description: The value of the attribute
- *                 example:
- *                   - id: "e7f3a1d1-3f1b-4c8e-b6b0-5e2f3c5d7a8e"
- *                     value: "Sample Attribute Value"
  *     responses:
  *       200:
  *         description: Product updated successfully
@@ -212,7 +196,108 @@
  *       404:
  *         description: Product not found
  */
-
+/**
+ * @swagger
+ * /api/products/{productId}/versions:
+ *   get:
+ *     summary: Get product versions
+ *     description: This endpoint allows authenticated users to retrieve versions of a product by its ID.
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
+ *     parameters:
+ *       - name: productId
+ *         in: path
+ *         required: true
+ *         description: ID of the product to retrieve versions
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved product versions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 versions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       versionNumber:
+ *                         type: number
+ *                       productName:
+ *                         type: string
+ *                       price:
+ *                         type: number
+ *                       description:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized, user not authenticated
+ *       404:
+ *         description: Product not found
+ */
+/**
+ * @swagger
+ * /api/products/{productId}/version/{versionId}:
+ *   post:
+ *     summary: Replace a product with a specific version
+ *     description: This endpoint allows an admin to replace the current product data with a specified version from the product version history.
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
+ *     parameters:
+ *       - name: productId
+ *         in: path
+ *         required: true
+ *         description: ID of the product to be replaced
+ *         schema:
+ *           type: string
+ *       - name: versionId
+ *         in: path
+ *         required: true
+ *         description: ID of the version to replace the product with
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product replaced successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Product replaced successfully"
+ *                 response:
+ *                   type: object
+ *                   properties:
+ *                     productName:
+ *                       type: string
+ *                       example: "Updated Product Name"
+ *                     price:
+ *                       type: number
+ *                       format: float
+ *                       example: 99.99
+ *                     description:
+ *                       type: string
+ *                       example: "Updated product description."
+ *       400:
+ *         description: Validation error, invalid input data
+ *       401:
+ *         description: Unauthorized, user not authenticated
+ *       404:
+ *         description: Product or version not found
+ */
 /**
  * @swagger
  * /api/products/{productId}:

@@ -101,6 +101,58 @@ export class ProductController {
     return res.status(200).json(result);
   }
 
+  async getProductVersions(
+    req: CustomRequest,
+    res: Response
+  ): Promise<Response> {
+    const productId = req.params.productId;
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: "No userId" });
+    }
+
+    const role = req.user?.role;
+    if (role !== "admin") {
+      return res.status(401).json({ error: "User not have permission" });
+    }
+    const result = await this.productService.getProductVersions(
+      userId,
+      productId
+    );
+
+    if (result.error) {
+      return res.status(400).json({ error: result.error });
+    }
+    return res.status(200).json(result);
+  }
+
+  async setProductVersion(
+    req: CustomRequest,
+    res: Response
+  ): Promise<Response> {
+    const productId = req.params.productId;
+    const versionId = req.params.versionId;
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: "No userId" });
+    }
+
+    const role = req.user?.role;
+    if (role !== "admin") {
+      return res.status(401).json({ error: "User not have permission" });
+    }
+    const result = await this.productService.setProductVersion(
+      userId,
+      productId,
+      versionId
+    );
+
+    if (result.error) {
+      return res.status(400).json({ error: result.error });
+    }
+    return res.status(200).json(result);
+  }
+
   async deleteProduct(req: CustomRequest, res: Response): Promise<Response> {
     const productId = req.params.productId;
     const userId = req.user?.userId;

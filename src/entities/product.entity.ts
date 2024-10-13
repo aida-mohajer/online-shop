@@ -16,6 +16,7 @@ import { Feedback } from "./feedback.entity";
 import { Order } from "./order.entity";
 import { ProductImages } from "./product-images.entity";
 import { SubAttributes } from "./subattribues.entity";
+import { ProductVersion } from "./product-version.entity";
 
 @Entity({ name: "product" })
 export class Product extends Base {
@@ -59,4 +60,7 @@ export class Product extends Base {
   @ManyToMany(() => SubAttributes, (subAttribute) => subAttribute.products)
   @JoinTable({ name: "product_subAttributes" })
   subAttributes!: SubAttributes[];
+
+  @OneToMany(() => ProductVersion, (version) => version.product)
+  versions!: ProductVersion[];
 }

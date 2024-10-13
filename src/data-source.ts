@@ -12,6 +12,7 @@ import { ProductImages } from "./entities/product-images.entity";
 import { Attribute } from "./entities/attribute.entity";
 import { SubAttributes } from "./entities/subattribues.entity";
 import { CategoryViewLog } from "./entities/category-view.entity";
+import { ProductVersion } from "./entities/product-version.entity";
 
 dotenv.config();
 
@@ -29,8 +30,8 @@ export const AppDataSource = new DataSource({
   database: DB_DATABASE,
 
   synchronize: true,
-  // logging: NODE_ENV === "dev",
-  logging: true,
+  logging: NODE_ENV === "dev",
+  // logging: true,
   entities: [
     User,
     Product,
@@ -43,6 +44,7 @@ export const AppDataSource = new DataSource({
     Attribute,
     SubAttributes,
     CategoryViewLog,
+    ProductVersion,
   ],
   migrations: [__dirname + "/migration/*.ts"],
   subscribers: [],

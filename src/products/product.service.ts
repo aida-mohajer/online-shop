@@ -15,13 +15,18 @@ import { Search } from "../middlewares/search";
 import { ReadCategoryProductsDto } from "./dto/read-category-products.dto";
 import { SubAttributes } from "../entities/subattribues.entity";
 import { ReadFilterProductsdto } from "./dto/read-filter-products.dto";
+import { ProductVersion } from "../entities/product-version.entity";
+import { ReadGetProductVersionDto } from "./dto/read-get-productVersion.dto";
 
 export class ProductService {
   constructor(
     private productRepository = AppDataSource.getRepository(Product),
     private categoryRepository = AppDataSource.getRepository(Category),
     private userRepository = AppDataSource.getRepository(User),
-    private subAttrsRepository = AppDataSource.getRepository(SubAttributes)
+    private subAttrsRepository = AppDataSource.getRepository(SubAttributes),
+    private productVersionRepository = AppDataSource.getRepository(
+      ProductVersion
+    )
   ) {}
   async addProduct(
     userId: string,
@@ -237,13 +242,29 @@ export class ProductService {
 
       const product = await this.productRepository.findOne({
         where: { id: productId },
+        relations: ["versions"],
       });
       if (!product) {
         return { error: "Product not found" };
       }
 
+      const latestVersionNumber =
+        product.versions.length > 0
+          ? Math.max(...product.versions.map((v) => v.versionNumber))
+          : 0;
+
       Object.assign(product, data);
       await this.productRepository.save(product);
+
+      const productVersion = this.productVersionRepository.create({
+        productId: product.id,
+        versionNumber: latestVersionNumber + 1,
+        productName: product.productName,
+        price: product.price,
+        description: product.description,
+      });
+
+      await this.productVersionRepository.save(productVersion);
 
       return {
         message: "Product updated successfully",
@@ -255,6 +276,85 @@ export class ProductService {
       };
     } catch (error) {
       console.error("Error during updating product:", error);
+      return { error: "An unexpected error occurred" };
+    }
+  }
+
+  async getProductVersions(
+    userId: string,
+    productId: string
+  ): Promise<ReadGetProductVersionDto> {
+    try {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      if (!user) {
+        return { error: "User not found" };
+      }
+
+      const productVersions = await this.productVersionRepository.find({
+        where: { product: { id: productId } },
+        relations: ["product"],
+        order: { versionNumber: "ASC" },
+      });
+
+      if (!productVersions || productVersions.length === 0) {
+        return { error: "No versions found for the product" };
+      }
+
+      const versionsData = productVersions.map((version) => ({
+        id: version.id,
+        versionNumber: version.versionNumber,
+        productName: version.productName,
+        price: version.price,
+        description: version.description,
+        createdAt: version.createdAt,
+      }));
+
+      return {
+        message: "Product versions retrieved successfully",
+        versions: versionsData,
+      };
+    } catch (error) {
+      console.error("Error during retrieve product version:", error);
+      return { error: "An unexpected error occurred" };
+    }
+  }
+
+  async setProductVersion(
+    userId: string,
+    productId: string,
+    versionId: string
+  ): Promise<{ error?: string; message?: string }> {
+    try {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      if (!user) {
+        return { error: "User not found" };
+      }
+
+      const product = await this.productRepository.findOne({
+        where: { id: productId },
+      });
+      if (!product) {
+        return { error: "Product not found" };
+      }
+
+      const productVersion = await this.productVersionRepository.findOne({
+        where: { id: versionId },
+      });
+      if (!productVersion) {
+        return { error: "Product version not found" };
+      }
+
+      product.productName = productVersion.productName;
+      product.price = productVersion.price;
+      product.description = productVersion.description;
+
+      await this.productRepository.save(product);
+
+      return {
+        message: "Product replaced successfully",
+      };
+    } catch (error) {
+      console.error("Error during set product version:", error);
       return { error: "An unexpected error occurred" };
     }
   }
