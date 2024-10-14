@@ -19,6 +19,7 @@ import { attributeRouter } from "./attributes/attribute.routes";
 import { subAttrRouter } from "./sub-attributes/sub-attr.routes";
 import cookieParser from "cookie-parser";
 import "./cron-jobs";
+import { webpageRouter } from "./webpage/webpage.routes";
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use("/api/images/", uploadImageRouter);
 app.use("/api/product/images/", productImageRouter);
 app.use("/api/attributes/", attributeRouter);
 app.use("/api/sub-attr/", subAttrRouter);
+app.use("/api/webpage/", webpageRouter);
 
 app.use(errorHandler);
 
